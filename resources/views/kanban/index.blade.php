@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>EPG Kanban Board</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
     <style>
         /* ═══════════════════════════════════════════════
@@ -13,9 +13,9 @@
         ═══════════════════════════════════════════════ */
         :root {
             /* Light mode */
-            --bg:        #f0f4f9;
+            --bg:        #e1e4e6;
             --surface:   #ffffff;
-            --surface2:  #f4f7fb;
+            --surface2:  #f2faf5;
             --border:    #dde3ed;
             --border2:   #c5d0e0;
             --text:      #0d1b2e;
@@ -44,13 +44,21 @@
             --accent-bg2:rgba(26,112,212,0.2);
         }
 
+        [data-theme="dark"] .sidebar,
+        [data-theme="dark"] .topbar {
+            background: rgba(7,9,14,0.75);
+            border-color: rgba(255,255,255,0.05);
+            box-shadow: 4px 0 28px rgba(0,0,0,0.45);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--bg);
             color: var(--text);
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
             display: flex;
         }
 
@@ -58,14 +66,18 @@
         .sidebar {
             width: var(--sidebar-w);
             min-width: var(--sidebar-w);
-            background: var(--surface);
-            border-right: 1px solid var(--border);
+            background: rgba(255,255,255,0.72);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-right: 1px solid rgba(200,220,210,0.55);
+            box-shadow: 4px 0 28px rgba(0,0,0,0.07);
             display: flex;
             flex-direction: column;
             height: 100vh;
             position: sticky;
             top: 0;
             overflow-y: auto;
+            z-index: 10;
         }
 
         /* EPG Logo Area */
@@ -107,21 +119,27 @@
         .epg-logo-text {
             display: flex;
             flex-direction: column;
-            line-height: 1.1;
+            line-height: 1.15;
         }
 
         .epg-logo-name {
-            font-size: 0.88rem;
-            font-weight: 700;
+            font-size: 0.92rem;
+            font-weight: 800;
             color: var(--accent);
-            letter-spacing: 0.04em;
+            letter-spacing: 0.01em;
+        }
+
+        .epg-logo-name span {
+            color: var(--text3);
+            font-weight: 600;
+            font-size: 0.82rem;
         }
 
         .epg-logo-sub {
-            font-size: 0.6rem;
+            font-size: 0.58rem;
             font-weight: 500;
             color: var(--text3);
-            letter-spacing: 0.06em;
+            letter-spacing: 0.07em;
             text-transform: uppercase;
         }
 
@@ -295,6 +313,15 @@
             font-weight: 700;
             flex-shrink: 0;
             color: white;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 50%;
         }
 
         .user-nav-item .nav-count {
@@ -339,6 +366,7 @@
             font-weight: 700;
             color: white;
             flex-shrink: 0;
+            overflow: hidden;
         }
 
         .profile-info { flex: 1; min-width: 0; }
@@ -386,7 +414,6 @@
                 background: rgba(220,38,38,0.1);
                 border-color: rgba(220,38,38,0.25);
                 color: #f87171;
-            }
         }
 
         /* ── MAIN AREA ── */
@@ -401,18 +428,27 @@
         .topbar {
             height: var(--topbar-h);
             padding: 0 1.5rem;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid rgba(200,220,210,0.55);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: var(--surface);
+            background: rgba(255,255,255,0.72);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
             flex-shrink: 0;
+            z-index: 9;
+            width: 100%;
+            overflow: hidden;
+            gap: 0.5rem;
         }
 
         .topbar-left {
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            flex: 1;
+            min-width: 0;
         }
 
         /* Non-admin logo in topbar */
@@ -475,6 +511,7 @@
             display: flex;
             align-items: center;
             gap: 0.65rem;
+            flex-shrink: 0;
         }
 
         .topbar-user-name {
@@ -482,6 +519,36 @@
             font-weight: 500;
             color: var(--text2);
         }
+
+        /* ── Theme Toggle Switch ── */
+        .theme-switch {
+            width: 44px;
+            height: 24px;
+            background: var(--border2);
+            border-radius: 999px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+            flex-shrink: 0;
+            border: 1.5px solid var(--border2);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+        }
+
+        [data-theme="dark"] .theme-switch { background: var(--accent); border-color: var(--accent); }
+
+        .theme-switch-thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.25);
+            transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+        }
+
+        [data-theme="dark"] .theme-switch-thumb { transform: translateX(20px); }
 
         /* Buttons */
         .btn {
@@ -496,6 +563,43 @@
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
+        }
+
+        .btn-pill {
+            padding: 0.28rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1.5px solid var(--border2);
+            background: var(--surface);
+            color: var(--text2);
+            transition: all 0.18s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            letter-spacing: 0.01em;
+            text-decoration: none;
+        }
+
+        .btn-pill:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-bg);
+            transform: translateY(-1px);
+        }
+
+        .btn-pill-accent {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: transparent;
+        }
+
+        .btn-pill-accent:hover {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 14px rgba(0,85,179,0.22);
         }
 
         .btn-primary {
@@ -525,14 +629,15 @@
         .board-wrap {
             flex: 1;
             overflow-x: auto;
-            overflow-y: auto;
+            overflow-y: hidden;
+            min-height: 0; /* critical: allows flex child to shrink & scroll */
         }
 
         .board {
             display: flex;
             gap: 1rem;
             padding: 1.25rem;
-            min-height: 100%;
+            height: 100%;
             align-items: flex-start;
         }
 
@@ -545,6 +650,7 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            max-height: calc(100vh - var(--topbar-h) - 2.5rem);
         }
 
         .column-header {
@@ -594,6 +700,9 @@
             font-size: 0.82rem;
             transition: all 0.15s;
             line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .btn-icon:hover {
@@ -604,7 +713,15 @@
         [data-theme="dark"] .btn-icon:hover {
                 background: rgba(220,38,38,0.1);
                 color: #f87171;
-            }
+        }
+
+        .btn-icon.edit:hover {
+            background: var(--accent-bg);
+            color: var(--accent2);
+        }
+        [data-theme="dark"] .btn-icon.edit:hover {
+            background: var(--accent-bg);
+            color: var(--accent2);
         }
 
         .task-list {
@@ -614,6 +731,8 @@
             gap: 0.4rem;
             min-height: 52px;
             flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .task-card {
@@ -634,7 +753,7 @@
 
         [data-theme="dark"] .task-card:hover {
                 box-shadow: 0 4px 14px rgba(0,0,0,0.4);
-            }
+        }
 
         .task-card:active { cursor: grabbing; }
 
@@ -671,8 +790,8 @@
         }
 
         .task-owner-avatar {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             font-size: 0.58rem;
             font-weight: 700;
@@ -681,6 +800,16 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            overflow: hidden;
+            box-shadow: 0 0 0 1.5px var(--surface), 0 0 0 2.5px var(--border2);
+        }
+
+        .task-owner-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 50%;
         }
 
         .task-owner-name {
@@ -930,21 +1059,13 @@
 <aside class="sidebar">
     {{-- EPG Logo --}}
     <div class="sidebar-logo">
-        <div class="epg-logo">
-            <div class="epg-logo-icon">
-                {{-- EPG-style grid/kanban icon --}}
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="3" y="3" width="7" height="10" rx="1.5"/>
-                    <rect x="3" y="16" width="7" height="5" rx="1.5"/>
-                    <rect x="14" y="3" width="7" height="5" rx="1.5"/>
-                    <rect x="14" y="11" width="7" height="10" rx="1.5"/>
-                </svg>
-            </div>
+        <a href="{{ route('kanban.index') }}" class="epg-logo">
+            <img src="{{ asset('images/epg-logo.jpg') }}" alt="EPG" style="height:34px;width:34px;object-fit:cover;border-radius:50%;border:2px solid var(--border);flex-shrink:0;">
             <div class="epg-logo-text">
-                <span class="epg-logo-name">EPG</span>
-                <span class="epg-logo-sub">Kanban Board</span>
+                <span class="epg-logo-name">EPG <span>Kanban</span></span>
+                <span class="epg-logo-sub">Task Management</span>
             </div>
-        </div>
+        </a>
     </div>
 
     <div class="sidebar-nav">
@@ -952,8 +1073,7 @@
         <div class="nav-section-label">Workspace</div>
 
         <a href="{{ route('kanban.index') }}"
-           class="nav-item {{ !$selectedUserId ? 'active' : '' }}">
-            {{-- Overview icon --}}
+           class="nav-item {{ !$selectedUserId && request('view') !== 'mine' ? 'active' : '' }}">
             <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor">
                 <rect x="1" y="1" width="6" height="6" rx="1"/>
                 <rect x="9" y="1" width="6" height="6" rx="1"/>
@@ -962,6 +1082,16 @@
             </svg>
             All Tasks
             <span class="nav-count">{{ $users->sum('tasks_count') }}</span>
+        </a>
+
+        <a href="{{ route('kanban.index', ['view' => 'mine']) }}"
+           class="nav-item {{ request('view') === 'mine' ? 'active' : '' }}">
+            <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor">
+                <circle cx="8" cy="5" r="3"/>
+                <path d="M2 14c0-3.31 2.69-6 6-6s6 2.69 6 6H2z"/>
+            </svg>
+            My Tasks
+            <span class="nav-count">{{ $adminTasksCount }}</span>
         </a>
 
         <div class="sidebar-divider"></div>
@@ -996,7 +1126,13 @@
             @endphp
             <a href="{{ route('kanban.index', ['user_id' => $u->id]) }}"
                class="user-nav-item {{ $selectedUserId == $u->id ? 'active' : '' }}">
-                <div class="user-avatar" style="background: {{ $uc }}">{{ $ui }}</div>
+                <div class="user-avatar" @if(!$u->avatar) style="background:{{ $uc }}" @endif>
+                    @if($u->avatar)
+                        <img src="{{ asset('storage/' . $u->avatar) }}" alt="{{ $u->name }}">
+                    @else
+                        {{ $ui }}
+                    @endif
+                </div>
                 <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                     {{ $u->name }}
                 </span>
@@ -1043,10 +1179,7 @@
             @if(!$isAdmin)
             {{-- Show brand for regular user --}}
             <div class="topbar-brand">
-                <div class="topbar-brand-icon">
-                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="10" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="11" width="7" height="10" rx="1.5"/></svg>
-                </div>
-                <span style="font-size:0.82rem;font-weight:700;color:var(--accent);letter-spacing:0.04em;">EPG</span>
+                <img src="{{ asset('images/epg-logo.jpg') }}" alt="EPG" style="height:30px;width:30px;object-fit:cover;border-radius:50%;">
             </div>
             <div style="width:1px;height:20px;background:var(--border);"></div>
             @endif
@@ -1057,7 +1190,7 @@
                 @elseif($isAdmin)
                     All Tasks Overview
                 @else
-                    My Kanban Board
+                    EPG WORKSPACE
                 @endif
             </span>
 
@@ -1074,14 +1207,15 @@
 
         <div class="topbar-right">
             {{-- Dark mode toggle --}}
-            <button class="btn btn-secondary" id="themeToggle" style="padding:0.4rem 0.6rem" title="Toggle dark mode">
-                <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:15px;height:15px;display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                <svg id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:15px;height:15px"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            </button>
+            <div class="theme-switch" id="themeToggle" title="Toggle dark mode">
+                <div class="theme-switch-thumb"></div>
+            </div>
 
             @if(!$isAdmin)
-                <a href="{{ route('profile') }}" class="btn btn-secondary" style="padding:0.4rem 0.75rem">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <a href="{{ route('profile') }}" class="btn btn-secondary" style="padding:0.3rem 0.5rem 0.3rem 0.3rem; gap: 0.4rem;">
+                    <div style="width:26px;height:26px;border-radius:50%;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#0055b3,#1a70d4);display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;color:white;">
+                        @if(auth()->user()->avatar)<img src="{{ asset('storage/' . auth()->user()->avatar) }}" style="width:100%;height:100%;object-fit:cover;" alt="">@else{{ strtoupper(substr(auth()->user()->name,0,1)) }}@endif
+                    </div>
                     {{ auth()->user()->name }}
                 </a>
                 <form action="{{ route('logout') }}" method="POST">
@@ -1089,12 +1223,18 @@
                     <button type="submit" class="btn btn-secondary">تسجيل الخروج</button>
                 </form>
             @else
-                <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary" style="padding:0.4rem 0.75rem">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:14px;height:14px"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                <div style="display:flex;align-items:center;gap:0.4rem;padding:0 0.25rem;">
+                    <div style="width:28px;height:28px;border-radius:50%;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#0055b3,#1a70d4);display:flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:700;color:white;border:2px solid rgba(0,85,179,0.15);">
+                        @if(auth()->user()->avatar)<img src="{{ asset('storage/' . auth()->user()->avatar) }}" style="width:100%;height:100%;object-fit:cover;" alt="">@else{{ strtoupper(substr(auth()->user()->name,0,1)) }}@endif
+                    </div>
+                    <span style="font-size:0.77rem;font-weight:600;color:var(--text2);">{{ auth()->user()->name }}</span>
+                </div>
+                <a href="{{ route('admin.dashboard') }}" class="btn-pill">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:12px;height:12px;flex-shrink:0"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                     Dashboard
                 </a>
-                <button class="btn btn-primary" onclick="openColumnModal()">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <button class="btn-pill btn-pill-accent" onclick="openColumnModal()">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     Add Column
                 </button>
             @endif
@@ -1105,20 +1245,25 @@
     <div class="board-wrap">
         <div class="board" id="board">
             @foreach($columns as $column)
-            <div class="column" data-column-id="{{ $column->id }}">
+            <div class="column" data-column-id="{{ $column->id }}" data-column-name="{{ $column->name }}" data-column-color="{{ $column->color }}">
                 <div class="column-header">
                     <div class="column-title">
                         <div class="column-dot" style="background: {{ $column->color }}"></div>
                         {{ $column->name }}
                         <span class="column-count">{{ $column->tasks->count() }}</span>
                     </div>
-                    @if($isAdmin)
-                    <form action="{{ route('kanban.columns.destroy', $column) }}" method="POST"
-                          onsubmit="return confirm('Delete column «{{ $column->name }}»?')">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="btn-icon" title="Delete column">&#215;</button>
-                    </form>
-                    @endif
+                    <div style="display:flex;gap:0.2rem;align-items:center;">
+                        <button type="button" class="btn-icon edit" title="Edit column" onclick="openEditColumnModal(this)">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        @if($isAdmin)
+                        <form action="{{ route('kanban.columns.destroy', $column) }}" method="POST"
+                              onsubmit="return confirm('Delete column «{{ $column->name }}»?')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="btn-icon" title="Delete column">&#215;</button>
+                        </form>
+                        @endif
+                    </div>
                 </div>
 
                 <div class="task-list" id="task-list-{{ $column->id }}" data-column="{{ $column->id }}">
@@ -1142,7 +1287,13 @@
 
                         @if($isAdmin)
                         <div class="task-owner-row">
-                            <div class="task-owner-avatar" style="background: {{ $tc }}">{{ $ti }}</div>
+                            <div class="task-owner-avatar" @if(!($task->user && $task->user->avatar)) style="background:{{ $tc }}" @endif>
+                                @if($task->user && $task->user->avatar)
+                                    <img src="{{ asset('storage/' . $task->user->avatar) }}" alt="{{ $task->user->name }}">
+                                @else
+                                    {{ $ti }}
+                                @endif
+                            </div>
                             <span class="task-owner-name">{{ $task->user?->name ?? 'Unknown' }}</span>
                         </div>
                         @endif
@@ -1174,13 +1325,11 @@
                     @endforelse
                 </div>
 
-                {{-- Add Task: only for regular users, NOT admin --}}
-                @if(!$isAdmin)
+                {{-- Add Task button for all users including admin --}}
                 <button class="add-task-btn" onclick="openTaskModal({{ $column->id }})">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     Add Task
                 </button>
-                @endif
             </div>
             @endforeach
 
@@ -1194,13 +1343,26 @@
     </div>
 </div>
 
-{{-- ── TASK MODAL (for users only) ── --}}
-@if(!$isAdmin)
+{{-- ── TASK MODAL (for all users including admin) ── --}}
 <div class="modal-overlay" id="taskModal">
     <div class="modal">
         <div class="modal-header">
             <h3>New Task</h3>
             <button class="modal-close" onclick="closeModal('taskModal')">&#215;</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.6rem;padding:0.75rem 0 0.75rem;margin-bottom:0.5rem;border-bottom:1px solid var(--border);">
+            <div style="width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#0055b3,#1a70d4);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:white;box-shadow:0 0 0 2px var(--surface),0 0 0 3.5px var(--border2);">
+                @if(auth()->user()->avatar)
+                    <img src="{{ asset('storage/' . auth()->user()->avatar) }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="">
+                @else
+                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                @endif
+            </div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-size:0.78rem;font-weight:700;color:var(--text);line-height:1.2;">{{ auth()->user()->name }}</div>
+                <div style="font-size:0.68rem;color:var(--text3);">{{ auth()->user()->isAdmin() ? 'Admin' : 'Member' }} · Adding new task</div>
+            </div>
+            <span style="font-size:0.63rem;font-weight:700;padding:0.16rem 0.5rem;border-radius:999px;background:var(--accent-bg);color:var(--accent2);border:1px solid var(--accent-bg2);text-transform:uppercase;letter-spacing:0.05em;">New</span>
         </div>
         <form action="{{ route('kanban.tasks.store') }}" method="POST">
             @csrf
@@ -1228,10 +1390,33 @@
         </form>
     </div>
 </div>
-@endif
+
+{{-- ── EDIT COLUMN MODAL (for all users) ── --}}
+<div class="modal-overlay" id="editColumnModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Edit Column</h3>
+            <button class="modal-close" onclick="closeModal('editColumnModal')">&#215;</button>
+        </div>
+        <form id="editColumnForm" method="POST">
+            @csrf @method('PATCH')
+            <div class="form-group">
+                <label>Column Name</label>
+                <input type="text" name="name" id="editColumnName" required>
+            </div>
+            <div class="form-group">
+                <label>Color</label>
+                <input type="color" name="color" id="editColumnColor">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('editColumnModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 @if($isAdmin)
-{{-- ── COLUMN MODAL (admin only) ── --}}
 <div class="modal-overlay" id="columnModal">
     <div class="modal">
         <div class="modal-header">
@@ -1320,6 +1505,14 @@
         document.getElementById('editTaskModal').classList.add('active');
     }
 
+    function openEditColumnModal(btn) {
+        const col = btn.closest('.column');
+        document.getElementById('editColumnName').value  = col.dataset.columnName;
+        document.getElementById('editColumnColor').value = col.dataset.columnColor;
+        document.getElementById('editColumnForm').action = `/kanban/columns/${col.dataset.columnId}`;
+        document.getElementById('editColumnModal').classList.add('active');
+    }
+
     function closeModal(id) {
         document.getElementById(id).classList.remove('active');
     }
@@ -1333,6 +1526,28 @@
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
             document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+        }
+    });
+
+    /* ── Sortable Columns ── */
+    new Sortable(document.getElementById('board'), {
+        group: 'columns',
+        animation: 150,
+        handle: '.column-header',
+        draggable: '.column',
+        ghostClass: 'sortable-ghost',
+        dragClass: 'sortable-drag',
+        onEnd: function () {
+            const payload = [];
+            document.querySelectorAll('.column[data-column-id]').forEach((col, index) => {
+                payload.push({ id: col.dataset.columnId, position: index });
+            });
+
+            fetch('{{ route("kanban.columns.reorder") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                body: JSON.stringify({ columns: payload }),
+            });
         }
     });
 
@@ -1373,8 +1588,6 @@
     (function() {
         const saved = localStorage.getItem('epg-theme') || 'light';
         document.documentElement.setAttribute('data-theme', saved);
-        document.getElementById('icon-sun').style.display  = saved === 'dark'  ? 'block' : 'none';
-        document.getElementById('icon-moon').style.display = saved === 'light' ? 'block' : 'none';
     })();
 
     document.getElementById('themeToggle').addEventListener('click', () => {
@@ -1382,8 +1595,6 @@
         const next = curr === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
         localStorage.setItem('epg-theme', next);
-        document.getElementById('icon-sun').style.display  = next === 'dark'  ? 'block' : 'none';
-        document.getElementById('icon-moon').style.display = next === 'light' ? 'block' : 'none';
     });
 </script>
 

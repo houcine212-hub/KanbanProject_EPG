@@ -17,6 +17,7 @@ class KanbanController extends Controller
         $users = collect();
         $selectedUser = null;
         $selectedUserId = null;
+        $adminTasksCount = 0;
 
         if ($isAdmin) {
             $users = User::where('role', 'user')
@@ -24,12 +25,17 @@ class KanbanController extends Controller
                 ->orderBy('name')
                 ->get();
 
+            $adminTasksCount = KanbanTask::where('user_id', $user->id)->count();
             $selectedUserId = $request->query('user_id');
             $selectedUser = $selectedUserId ? User::find($selectedUserId) : null;
         }
 
-        $columns = KanbanColumn::with(['tasks' => function ($query) use ($user, $isAdmin, $selectedUserId) {
-            if ($isAdmin && $selectedUserId) {
+        $viewMine = $request->query('view') === 'mine';
+
+        $columns = KanbanColumn::with(['tasks' => function ($query) use ($user, $isAdmin, $selectedUserId, $viewMine) {
+            if ($isAdmin && $viewMine) {
+                $query->where('user_id', $user->id);
+            } elseif ($isAdmin && $selectedUserId) {
                 $query->where('user_id', $selectedUserId);
             } elseif (!$isAdmin) {
                 $query->where('user_id', $user->id);
@@ -37,7 +43,7 @@ class KanbanController extends Controller
             $query->with('user')->orderBy('position');
         }])->orderBy('position')->get();
 
-        return view('kanban.index', compact('columns', 'isAdmin', 'users', 'selectedUser', 'selectedUserId'));
+        return view('kanban.index', compact('columns', 'isAdmin', 'users', 'selectedUser', 'selectedUserId', 'adminTasksCount'));
     }
 
     public function storeColumn(Request $request)
