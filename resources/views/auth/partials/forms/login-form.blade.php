@@ -1,7 +1,7 @@
 <form action="{{ route('login') }}" method="POST">
     @csrf
     
-    @include('auth.partials.form-input', [
+    @include('auth.partials.inputs.form-input', [
         'label' => 'البريد الإلكتروني',
         'type' => 'email',
         'name' => 'email',
@@ -10,7 +10,7 @@
         'autofocus' => true
     ])
 
-    @include('auth.partials.form-input', [
+    @include('auth.partials.inputs.form-input', [
         'label' => 'كلمة المرور',
         'type' => 'password',
         'name' => 'password',

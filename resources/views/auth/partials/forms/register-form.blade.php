@@ -1,7 +1,7 @@
 <form action="{{ route('register') }}" method="POST">
     @csrf
     
-    @include('auth.partials.form-input', [
+    @include('auth.partials.inputs.form-input', [
         'label' => 'الاسم الكامل',
         'type' => 'text',
         'name' => 'name',
@@ -10,7 +10,7 @@
         'autofocus' => true
     ])
 
-    @include('auth.partials.form-input', [
+    @include('auth.partials.inputs.form-input', [
         'label' => 'البريد الإلكتروني',
         'type' => 'email',
         'name' => 'email',
@@ -18,7 +18,7 @@
         'required' => true
     ])
 
-    @include('auth.partials.form-input', [
+    @include('auth.partials.inputs.form-input', [
         'label' => 'كلمة المرور',
         'type' => 'password',
         'name' => 'password',
@@ -27,7 +27,7 @@
         'hint' => '8 أحرف على الأقل'
     ])
 
-    @include('auth.partials.form-input', [
+    @include('auth.partials.inputs.form-input', [
         'label' => 'تأكيد كلمة المرور',
         'type' => 'password',
         'name' => 'password_confirmation',
