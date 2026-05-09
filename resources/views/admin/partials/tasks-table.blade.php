@@ -1,16 +1,16 @@
 <div class="table-card" id="tasks">
     <div class="table-card-header">
-        <span class="table-card-title">Recent Tasks</span>
-        @include('admin.components.badge', ['type' => 'gray', 'text' => $totalTasks . ' total'])
+        <span class="table-card-title">Tâches récentes</span>
+        @include('admin.components.badge', ['type' => 'gray', 'text' => $totalTasks . ' au total'])
     </div>
     <table>
         <thead>
             <tr>
-                <th>Title</th>
-                <th>Assigned To</th>
-                <th>Column</th>
-                <th>Priority</th>
-                <th>Created</th>
+                <th>Titre</th>
+                <th>Assigné à</th>
+                <th>Colonne</th>
+                <th>Priorité</th>
+                <th>Créée le</th>
                 <th></th>
             </tr>
         </thead>
@@ -41,7 +41,10 @@
                     </td>
                     <td>
                         <span class="priority-dot {{ $task->priority }}">
-                            {{ ucfirst($task->priority) }}
+                            @if($task->priority === 'high') Haute
+                            @elseif($task->priority === 'medium') Moyenne
+                            @else Basse
+                            @endif
                         </span>
                     </td>
                     <td style="color:var(--text3);font-size:0.75rem">
@@ -50,15 +53,15 @@
                     <td>
                         <form action="{{ route('kanban.tasks.destroy', $task) }}" method="POST">
                             @csrf @method('DELETE')
-                            <button type="submit" class="btn btn-danger" style="padding:0.28rem 0.6rem;font-size:0.72rem" onclick="return confirm('Delete task?')">
-                                Delete
+                            <button type="submit" class="btn btn-danger" style="padding:0.28rem 0.6rem;font-size:0.72rem" onclick="return confirm('Supprimer cette tâche ?')">
+                                Supprimer
                             </button>
                         </form>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="empty-state">No tasks yet</td>
+                    <td colspan="6" class="empty-state">Aucune tâche</td>
                 </tr>
             @endforelse
         </tbody>

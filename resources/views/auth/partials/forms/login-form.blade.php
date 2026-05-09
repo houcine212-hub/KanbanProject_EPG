@@ -1,17 +1,17 @@
 <form action="{{ route('login') }}" method="POST">
     @csrf
-    
+
     @include('auth.partials.inputs.form-input', [
-        'label' => 'البريد الإلكتروني',
+        'label' => 'Adresse e-mail',
         'type' => 'email',
         'name' => 'email',
-        'placeholder' => 'example@epg.ma',
+        'placeholder' => 'exemple@epg.ma',
         'required' => true,
         'autofocus' => true
     ])
 
     @include('auth.partials.inputs.form-input', [
-        'label' => 'كلمة المرور',
+        'label' => 'Mot de passe',
         'type' => 'password',
         'name' => 'password',
         'placeholder' => '••••••••',
@@ -21,11 +21,11 @@
     <div class="remember-row">
         <label>
             <input type="checkbox" name="remember">
-            تذكرني
+            Se souvenir de moi
         </label>
     </div>
 
-    <button type="submit" class="btn-submit">تسجيل الدخول</button>
+    <button type="submit" class="btn-submit">Se connecter</button>
 </form>
 
 <style>

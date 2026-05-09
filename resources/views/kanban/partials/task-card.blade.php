@@ -24,21 +24,26 @@
                     {{ $ti }}
                 @endif
             </div>
-            <span class="task-owner-name">{{ $task->user?->name ?? 'Unknown' }}</span>
+            <span class="task-owner-name">{{ $task->user?->name ?? 'Inconnu' }}</span>
         </div>
     @endif
 
     <div class="task-footer">
-        <span class="priority-badge priority-{{ $task->priority }}">{{ $task->priority }}</span>
+        <span class="priority-badge priority-{{ $task->priority }}">
+            @if($task->priority === 'low') Basse
+            @elseif($task->priority === 'medium') Moyenne
+            @else Haute
+            @endif
+        </span>
         <div class="task-actions">
             @if($isAdmin)
                 <button type="button" class="btn-task btn-task-edit"
-                        onclick="openEditModal(this.closest('.task-card'))">Edit</button>
+                        onclick="openEditModal(this.closest('.task-card'))">Modifier</button>
             @endif
             @if($isAdmin || $task->user_id === auth()->id())
                 <form action="{{ route('kanban.tasks.destroy', $task) }}" method="POST">
                     @csrf @method('DELETE')
-                    <button type="submit" class="btn-task btn-task-del">Delete</button>
+                    <button type="submit" class="btn-task btn-task-del">Supprimer</button>
                 </form>
             @endif
         </div>

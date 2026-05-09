@@ -238,7 +238,7 @@
         box-shadow: 0 4px 14px rgba(0,85,179,0.22);
     }
 
-    /* ── Theme Toggle Switch ── */
+    /* ── Interrupteur de thème ── */
     .theme-switch {
         width: 44px;
         height: 24px;

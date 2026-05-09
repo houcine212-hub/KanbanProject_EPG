@@ -9,10 +9,10 @@
 
 <div class="form-group">
     <label>{{ $label }}</label>
-    <input 
-        type="{{ $type }}" 
-        name="{{ $name }}" 
-        placeholder="{{ $placeholder }}" 
+    <input
+        type="{{ $type }}"
+        name="{{ $name }}"
+        placeholder="{{ $placeholder }}"
         value="{{ old($name, $value) }}"
         {{ $required ? 'required' : '' }}
         {{ $autofocus ? 'autofocus' : '' }}

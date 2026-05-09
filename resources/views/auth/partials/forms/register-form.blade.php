@@ -1,39 +1,39 @@
 <form action="{{ route('register') }}" method="POST">
     @csrf
-    
+
     @include('auth.partials.inputs.form-input', [
-        'label' => 'الاسم الكامل',
+        'label' => 'Nom complet',
         'type' => 'text',
         'name' => 'name',
-        'placeholder' => 'أدخل اسمك الكامل',
+        'placeholder' => 'Entrez votre nom complet',
         'required' => true,
         'autofocus' => true
     ])
 
     @include('auth.partials.inputs.form-input', [
-        'label' => 'البريد الإلكتروني',
+        'label' => 'Adresse e-mail',
         'type' => 'email',
         'name' => 'email',
-        'placeholder' => 'example@epg.ma',
+        'placeholder' => 'exemple@epg.ma',
         'required' => true
     ])
 
     @include('auth.partials.inputs.form-input', [
-        'label' => 'كلمة المرور',
+        'label' => 'Mot de passe',
         'type' => 'password',
         'name' => 'password',
         'placeholder' => '••••••••',
         'required' => true,
-        'hint' => '8 أحرف على الأقل'
+        'hint' => 'Au moins 8 caractères'
     ])
 
     @include('auth.partials.inputs.form-input', [
-        'label' => 'تأكيد كلمة المرور',
+        'label' => 'Confirmer le mot de passe',
         'type' => 'password',
         'name' => 'password_confirmation',
         'placeholder' => '••••••••',
         'required' => true
     ])
 
-    <button type="submit" class="btn-submit">إنشاء الحساب</button>
+    <button type="submit" class="btn-submit">Créer le compte</button>
 </form>

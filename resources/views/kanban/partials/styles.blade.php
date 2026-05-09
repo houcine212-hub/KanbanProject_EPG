@@ -1,6 +1,6 @@
 <style>
     /* ═══════════════════════════════════════════════
-       EPG.MA DESIGN SYSTEM — Blue & White / Dark Blue & Black
+       EPG.MA DESIGN SYSTEM — Bleu & Blanc / Bleu foncé & Noir
     ═══════════════════════════════════════════════ */
     :root {
         /* Light mode */

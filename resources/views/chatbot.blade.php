@@ -1,8 +1,4 @@
 <style>
-/* ═══════════════════════════════════════════════
-   CHAT WIDGET — AI Assistant (Robot Icon)
-   ═══════════════════════════════════════════════ */
-
 .chat-widget-container {
     position: fixed;
     bottom: 1.5rem;
@@ -171,7 +167,6 @@
 }
 
 .chat-close:hover { background: rgba(255,255,255,0.25); }
-.chat-close svg { width: 16px; height: 16px; }
 
 .chat-messages {
     flex: 1;
@@ -320,8 +315,6 @@
     cursor: not-allowed;
 }
 
-.chat-send-btn svg { width: 18px; height: 18px; }
-
 .chat-messages::-webkit-scrollbar { width: 4px; }
 .chat-messages::-webkit-scrollbar-track { background: transparent; }
 .chat-messages::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
@@ -345,7 +338,7 @@
 </style>
 
 <div class="chat-widget-container" id="chatWidget">
-    <button class="chat-toggle-btn" id="chatToggleBtn" onclick="toggleChat()" title="AI Assistant">
+    <button class="chat-toggle-btn" id="chatToggleBtn" onclick="toggleChat()" title="Assistant IA">
         <svg class="chat-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="11" width="18" height="10" rx="2"/>
             <circle cx="12" cy="5" r="2"/>
@@ -372,14 +365,14 @@
                     </svg>
                 </div>
                 <div>
-                    <div class="chat-title">مساعد EPG الذكي</div>
+                    <div class="chat-title">Assistant EPG</div>
                     <div class="chat-status">
                         <span class="status-dot"></span>
-                        متصل
+                        En ligne
                     </div>
                 </div>
             </div>
-            <button class="chat-close" onclick="toggleChat()" title="إغلاق">
+            <button class="chat-close" onclick="toggleChat()" title="Fermer">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
                     <line x1="18" y1="6" x2="6" y2="18"/>
                     <line x1="6" y1="6" x2="18" y2="18"/>
@@ -390,14 +383,14 @@
         <div class="chat-messages" id="chatMessages">
             <div class="chat-message ai-message">
                 <div class="message-bubble">
-                    مرحباً! 🤖 أنا مساعدك الذكي في EPG Kanban. يمكنني مساعدتك في:
-                    <ul style="margin:0.5rem 0 0 0;padding-right:1.2rem">
-                        <li>إدارة المهام والأعمدة</li>
-                        <li>الإجابة على استفساراتك</li>
-                        <li>تحليل بيانات اللوحة</li>
+                    Bonjour! Je suis votre assistant intelligent EPG Kanban. Je peux vous aider avec:
+                    <ul style="margin:0.5rem 0 0 0;padding-left:1.2rem">
+                        <li>Gestion des taches et colonnes</li>
+                        <li>Reponses a vos questions</li>
+                        <li>Analyse des donnees du tableau</li>
                     </ul>
                 </div>
-                <span class="message-time">الآن</span>
+                <span class="message-time">Maintenant</span>
             </div>
         </div>
 
@@ -413,9 +406,8 @@
                     type="text"
                     id="chatInput"
                     class="chat-input"
-                    placeholder="اكتب رسالتك هنا..."
+                    placeholder="Ecrivez votre message..."
                     autocomplete="off"
-                    dir="rtl"
                 >
                 <button type="submit" class="chat-send-btn" id="chatSendBtn" disabled>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -439,11 +431,9 @@
     let isOpen = false;
     let isTyping = false;
 
-    // Get CSRF token safely
     function getCsrfToken() {
         const meta = document.querySelector('meta[name="csrf-token"]');
         if (meta) return meta.content;
-        // Fallback: try to get from cookie
         const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
         if (match) {
             try {
@@ -478,7 +468,7 @@
     function addMessage(text, sender) {
         const div = document.createElement('div');
         div.className = 'chat-message ' + (sender === 'user' ? 'user-message' : 'ai-message');
-        const time = new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+        const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
         div.innerHTML = '<div class="message-bubble">' + escapeHtml(text) + '</div><span class="message-time">' + time + '</span>';
         chatMessages.appendChild(div);
         scrollToBottom();
@@ -509,10 +499,6 @@
         const csrfToken = getCsrfToken();
         const chatUrl = '{{ route("chat.ask") }}';
 
-        // Debug info (remove in production)
-        console.log('Chat URL:', chatUrl);
-        console.log('CSRF Token exists:', !!csrfToken);
-
         try {
             const response = await fetch(chatUrl, {
                 method: 'POST',
@@ -527,8 +513,7 @@
 
             if (!response.ok) {
                 const errorText = await response.text();
-                console.error('Server error:', response.status, errorText);
-                addMessage('خطأ من الخادم: ' + response.status + ' - ' + errorText.substring(0, 100), 'ai');
+                addMessage('Erreur serveur: ' + response.status + ' - ' + errorText.substring(0, 100), 'ai');
                 return;
             }
 
@@ -536,12 +521,11 @@
             if (data.reply) {
                 addMessage(data.reply, 'ai');
             } else {
-                addMessage('عذراً، لم أتمكن من معالجة طلبك.', 'ai');
+                addMessage('Desole, je n ai pas pu traiter votre demande.', 'ai');
             }
         } catch (err) {
             hideTyping();
-            console.error('Chat fetch error:', err);
-            addMessage('خطأ في الاتصال: ' + err.message, 'ai');
+            addMessage('Erreur de connexion: ' + err.message, 'ai');
         }
     }
 

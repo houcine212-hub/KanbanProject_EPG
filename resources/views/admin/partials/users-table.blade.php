@@ -1,14 +1,14 @@
 <div class="table-card" id="users">
     <div class="table-card-header">
-        <span class="table-card-title">Users</span>
-        @include('admin.components.badge', ['type' => 'blue', 'text' => $usersCount . ' total'])
+        <span class="table-card-title">Utilisateurs</span>
+        @include('admin.components.badge', ['type' => 'blue', 'text' => $usersCount . ' au total'])
     </div>
     <table>
         <thead>
             <tr>
-                <th>User</th>
-                <th>Tasks</th>
-                <th>Progress</th>
+                <th>Utilisateur</th>
+                <th>Tâches</th>
+                <th>Progression</th>
             </tr>
         </thead>
         <tbody>
@@ -39,7 +39,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="3" class="empty-state">No users yet</td>
+                    <td colspan="3" class="empty-state">Aucun utilisateur</td>
                 </tr>
             @endforelse
         </tbody>

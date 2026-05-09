@@ -4,23 +4,23 @@
             <img src="{{ asset('images/epg-logo.jpg') }}" alt="EPG">
             <div class="epg-logo-text">
                 <span class="epg-logo-name">EPG <span>Kanban</span></span>
-                <span class="epg-logo-sub">Task Management</span>
+                <span class="epg-logo-sub">Gestion des tâches</span>
             </div>
         </a>
     </div>
 
     <nav class="sidebar-nav">
-        <div class="nav-section-label">Main</div>
+        <div class="nav-section-label">Principal</div>
 
-        <a href="{{ route('kanban.index') }}" class="nav-item">Kanban Board</a>
+        <a href="{{ route('kanban.index') }}" class="nav-item">Tableau Kanban</a>
 
         @if(auth()->user()->isAdmin())
-        <a href="{{ route('admin.dashboard') }}" class="nav-item">Dashboard</a>
+        <a href="{{ route('admin.dashboard') }}" class="nav-item">Tableau de bord</a>
         @endif
 
-        <div class="nav-section-label">Account</div>
+        <div class="nav-section-label">Compte</div>
 
-        <a href="{{ route('profile') }}" class="nav-item active">My Profile</a>
+        <a href="{{ route('profile') }}" class="nav-item active">Mon profil</a>
     </nav>
 
     <div class="sidebar-bottom">
@@ -34,12 +34,12 @@
             </div>
             <div class="profile-info">
                 <div class="profile-name">{{ auth()->user()->name }}</div>
-                <div class="profile-role">{{ auth()->user()->isAdmin() ? 'Administrator' : 'Member' }}</div>
+                <div class="profile-role">{{ auth()->user()->isAdmin() ? 'Administrateur' : 'Membre' }}</div>
             </div>
         </div>
         <form action="{{ route('logout') }}" method="POST">
             @csrf
-            <button type="submit" class="btn-logout">تسجيل الخروج</button>
+            <button type="submit" class="btn-logout">Se déconnecter</button>
         </form>
     </div>
 </div>

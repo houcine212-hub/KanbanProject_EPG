@@ -9,7 +9,7 @@
         overflow: hidden;
     }
 
-    /* ── الحالة الأولى: الصفحة الكاملة باللون الأزرق ── */
+    /* ── État 1 : Page complète en bleu ── */
     .auth-container {
         position: relative;
         width: 100%;
@@ -20,7 +20,7 @@
         transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* دوائر خلفية شفافة */
+    /* Cercles de fond transparents */
     .auth-container .bg-circle {
         position: absolute;
         border-radius: 50%;
@@ -57,12 +57,12 @@
     }
 
     @keyframes gentle-float {
-        0%, 100% { 
-            transform: translateY(0) scale(1); 
+        0%, 100% {
+            transform: translateY(0) scale(1);
             opacity: 0.6;
         }
-        50% { 
-            transform: translateY(-15px) scale(1.02); 
+        50% {
+            transform: translateY(-15px) scale(1.02);
             opacity: 1;
         }
     }
@@ -72,7 +72,7 @@
         50% { transform: scale(1.05); opacity: 0.9; }
     }
 
-    /* ── المحتوى المركزي ── */
+    /* ── Contenu central ── */
     .hero-content {
         position: absolute;
         inset: 0;
@@ -112,7 +112,7 @@
         margin-bottom: 2rem;
     }
 
-    /* ── الأزرار العمودية ── */
+    /* ── Boutons verticaux ── */
     .hero-buttons {
         display: flex;
         flex-direction: column;
@@ -157,7 +157,7 @@
         height: 14px;
     }
 
-    /* ── الحالة الثانية: نموذج تسجيل الدخول ── */
+    /* ── État 2 : Formulaire de connexion ── */
     .auth-container.active-login {
         background: #f0f4f9;
     }
@@ -182,7 +182,7 @@
         transform: translateX(0);
     }
 
-    /* ── اللوحة الجانبية الزرقاء ── */
+    /* ── Barre latérale bleue ── */
     .left-sidebar {
         width: 380px;
         min-width: 380px;
@@ -262,7 +262,7 @@
         border-radius: 2px;
     }
 
-    /* ── لوحة النموذج ── */
+    /* ── Panneau du formulaire ── */
     .form-panel {
         flex: 1;
         display: flex;
@@ -342,12 +342,12 @@
         border-radius: 6px;
     }
 
-    .back-btn:hover { 
-        color: #0055b3; 
+    .back-btn:hover {
+        color: #0055b3;
         background: rgba(0,85,179,0.05);
     }
 
-    /* ── styles ديال النماذج (اللي كانو فالأسفل) ── */
+    /* ── Styles des formulaires ── */
     .form-group {
         margin-bottom: 1rem;
     }

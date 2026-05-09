@@ -1,25 +1,25 @@
 @extends('auth.layouts.auth-layout')
 
-@section('title', 'EPG — إنشاء حساب')
+@section('title', 'EPG — Créer un compte')
 
 @section('left-panel-content')
     <div class="left-content">
         <img src="{{ asset('images/epg-logo.jpg') }}" alt="EPG" class="left-logo">
-        <div class="left-title">إنضم إلى EPG</div>
-        <div class="left-sub">أنشئ حسابك وابدأ إدارة مهامك بكل سهولة</div>
+        <div class="left-title">Rejoignez EPG</div>
+        <div class="left-sub">Créez votre compte et commencez à gérer vos tâches facilement</div>
         <div class="left-divider"></div>
         <div class="steps">
             <div class="step">
                 <div class="step-num">1</div>
-                <div class="step-text">أنشئ حسابك</div>
+                <div class="step-text">Créez votre compte</div>
             </div>
             <div class="step">
                 <div class="step-num">2</div>
-                <div class="step-text">أضف مهامك</div>
+                <div class="step-text">Ajoutez vos tâches</div>
             </div>
             <div class="step">
                 <div class="step-num">3</div>
-                <div class="step-text">تابع التقدم</div>
+                <div class="step-text">Suivez vos progrès</div>
             </div>
         </div>
     </div>

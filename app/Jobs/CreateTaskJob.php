@@ -26,16 +26,14 @@ class CreateTaskJob implements ShouldQueue
     public function handle(): void
     {
         try {
-            // Use provided column or fallback to first column
             $columnId = $this->columnId
                 ?? KanbanColumn::orderBy('position')->value('id');
 
             if (!$columnId) {
-                Log::error('CreateTaskJob: No column found to assign the task.');
+                Log::error('CreateTaskJob: Aucune colonne trouvee pour assigner la tache.');
                 return;
             }
 
-            // Get max position in that column
             $maxPosition = KanbanTask::where('kanban_column_id', $columnId)->max('position') ?? 0;
 
             KanbanTask::create([
@@ -47,10 +45,10 @@ class CreateTaskJob implements ShouldQueue
                 'position'         => $maxPosition + 1,
             ]);
 
-            Log::info("CreateTaskJob: Task \"{$this->title}\" created successfully for user {$this->userId}");
+            Log::info("CreateTaskJob: Tache \"{$this->title}\" creee avec succes pour l utilisateur {$this->userId}");
 
         } catch (\Exception $e) {
-            Log::error('CreateTaskJob failed: ' . $e->getMessage());
+            Log::error('CreateTaskJob a echoue: ' . $e->getMessage());
             throw $e;
         }
     }

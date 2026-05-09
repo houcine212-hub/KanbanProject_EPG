@@ -10,25 +10,25 @@
 
         <span class="topbar-title">
             @if($isAdmin && $selectedUser)
-                Board of {{ $selectedUser->name }}
+                Tableau de {{ $selectedUser->name }}
             @elseif($isAdmin)
-                All Tasks Overview
+                Vue d'ensemble de toutes les tâches
             @else
-                EPG WORKSPACE
+                ESPACE DE TRAVAIL EPG
             @endif
         </span>
 
         @if($isAdmin && $selectedUser)
             <div class="viewing-badge">
                 <div class="dot"></div>
-                Viewing: {{ $selectedUser->name }}
+                Affichage : {{ $selectedUser->name }}
             </div>
         @endif
     </div>
 
     <div class="topbar-right">
         {{-- Dark mode toggle --}}
-        <div class="theme-switch" id="themeToggle" title="Toggle dark mode">
+        <div class="theme-switch" id="themeToggle" title="Basculer le mode sombre">
             <div class="theme-switch-thumb"></div>
         </div>
 
@@ -45,7 +45,7 @@
             </a>
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button type="submit" class="btn btn-secondary">تسجيل الخروج</button>
+                <button type="submit" class="btn btn-secondary">Se déconnecter</button>
             </form>
         @else
             <div style="display:flex;align-items:center;gap:0.4rem;padding:0 0.25rem;">
@@ -65,14 +65,14 @@
                     <rect x="3" y="14" width="7" height="7" rx="1"/>
                     <rect x="14" y="14" width="7" height="7" rx="1"/>
                 </svg>
-                Dashboard
+                Tableau de bord
             </a>
             <button class="btn-pill btn-pill-accent" onclick="openColumnModal()">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
                     <line x1="12" y1="5" x2="12" y2="19"/>
                     <line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
-                Add Column
+                Ajouter une colonne
             </button>
         @endif
     </div>

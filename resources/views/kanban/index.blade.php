@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ar" dir="ltr" data-theme="light">
+<html lang="fr" dir="ltr" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>EPG Kanban Board</title>
+    <title>Tableau Kanban EPG</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
     @include('kanban.partials.styles')
@@ -34,7 +34,7 @@
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     const isAdmin   = {{ $isAdmin ? 'true' : 'false' }};
 
-    /* ── Collapsible Users List ── */
+    /* ── Liste des utilisateurs repliable ── */
     function toggleUsers() {
         const btn  = document.getElementById('usersToggleBtn');
         const list = document.getElementById('usersList');
@@ -42,7 +42,7 @@
         list.classList.toggle('open');
     }
 
-    /* ── Modals ── */
+    /* ── Modales ── */
     function openTaskModal(columnId) {
         document.getElementById('taskColumnId').value = columnId;
         document.getElementById('taskModal').classList.add('active');
@@ -84,7 +84,7 @@
         }
     });
 
-    /* ── Sortable Columns ── */
+    /* ── Colonnes triables ── */
     new Sortable(document.getElementById('board'), {
         group: 'columns',
         animation: 150,
@@ -106,7 +106,7 @@
         }
     });
 
-    /* ── Sortable Tasks ── */
+    /* ── Tâches triables ── */
     document.querySelectorAll('.task-list').forEach(list => {
         new Sortable(list, {
             group: 'tasks',
@@ -139,7 +139,7 @@
         });
     });
 
-    /* ── Dark mode toggle ── */
+    /* ── Basculer le mode sombre ── */
     (function() {
         const saved = localStorage.getItem('epg-theme') || 'light';
         document.documentElement.setAttribute('data-theme', saved);

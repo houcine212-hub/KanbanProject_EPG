@@ -22,12 +22,11 @@ class ChatController extends Controller
 
             $user = auth()->user();
             if (!$user) {
-                return response()->json(['reply' => 'يرجى تسجيل الدخول أولاً.']);
+                return response()->json(['reply' => 'Veuillez vous connecter d abord.']);
             }
 
             $userMessage = trim($request->input('message'));
 
-            // ── 1. Pending delete confirmation ──────────────────────────
             $pendingDelete = Session::get('pending_delete_priority');
             if ($pendingDelete) {
                 if ($this->isConfirmation($userMessage)) {
@@ -36,51 +35,44 @@ class ChatController extends Controller
                 }
                 if ($this->isCancellation($userMessage)) {
                     Session::forget('pending_delete_priority');
-                    return response()->json(['reply' => '❌ تم إلغاء عملية الحذف.']);
+                    return response()->json(['reply' => 'Operation de suppression annulee.']);
                 }
             }
 
-            // ── 2. Detect create-task intent ────────────────────────────
             if ($this->hasCreateIntent($userMessage)) {
                 return $this->handleCreateTask($userMessage, $user);
             }
 
-            // ── 3. Detect delete-by-priority intent ─────────────────────
             $detectedPriority = $this->detectDeleteIntent($userMessage);
             if ($detectedPriority) {
                 $count = KanbanTask::where('priority', $detectedPriority)->count();
                 if ($count === 0) {
                     return response()->json([
-                        'reply' => "ℹ️ لا توجد مهام بأولوية **{$this->priorityLabel($detectedPriority)}** لحذفها."
+                        'reply' => "Aucune tache avec priorite {$this->priorityLabel($detectedPriority)} a supprimer."
                     ]);
                 }
                 Session::put('pending_delete_priority', $detectedPriority);
                 return response()->json([
-                    'reply' => "⚠️ أنت على وشك حذف **{$count} مهمة** بأولوية **{$this->priorityLabel($detectedPriority)}**.\n\nهذا الإجراء لا يمكن التراجع عنه!\n\nاكتب **تأكيد** للمتابعة أو **إلغاء** للتراجع."
+                    'reply' => "Vous etes sur le point de supprimer {$count} taches avec priorite {$this->priorityLabel($detectedPriority)}.\n\nCette action est irreversible!\n\nEcrivez CONFIRMER pour continuer ou ANNULER pour annuler."
                 ]);
             }
 
-            // ── 4. Everything else → Groq AI ────────────────────────────
             $aiReply = $this->callGroqApi($userMessage, $user);
             return response()->json([
-                'reply' => $aiReply ?? 'عذراً، لم أتمكن من معالجة طلبك. حاول مرة أخرى.'
+                'reply' => $aiReply ?? 'Desole, je n ai pas pu traiter votre demande. Reessayez.'
             ]);
 
         } catch (\Exception $e) {
             Log::error('Chat Error: ' . $e->getMessage());
-            return response()->json(['reply' => 'حدث خطأ غير متوقع، يرجى المحاولة لاحقاً.'], 500);
+            return response()->json(['reply' => 'Une erreur inattendue s est produite. Reessayez plus tard.'], 500);
         }
     }
-
-    // ══════════════════════════════════════════════════════════════
-    //  CREATE TASK
-    // ══════════════════════════════════════════════════════════════
 
     private function hasCreateIntent(string $message): bool
     {
         return $this->containsAny(mb_strtolower($message), [
-            'زيد', 'أضف', 'اضف', 'إضافة', 'أنشئ', 'انشئ',
-            'create', 'add task', 'ajouter', 'creer', 'nouvelle tache',
+            'ajouter', 'ajoute', 'creer', 'cree', 'nouvelle tache',
+            'create', 'add task', 'new task',
         ]);
     }
 
@@ -90,8 +82,8 @@ class ChatController extends Controller
 
         if (!$parsed || empty($parsed['title'])) {
             return response()->json([
-                'reply' => "لم أفهم تفاصيل المهمة. يرجى الكتابة بهذا الشكل:\n\n"
-                    . "**زيد task** [العنوان] priority [high/medium/low] سند لـ [اسم المستخدم] بعد [X دقائق/ساعات]"
+                'reply' => "Je n ai pas compris les details de la tache. Veuillez ecrire sous cette forme:\n\n"
+                    . "AJOUTER tache [titre] priorite [haute/moyenne/basse] assigner a [nom utilisateur] apres [X minutes/heures]"
             ]);
         }
 
@@ -102,8 +94,7 @@ class ChatController extends Controller
         $schedule    = $parsed['schedule']    ?? null;
         $assigneeName = $parsed['assigned_to'] ?? null;
 
-        // ── Resolve assignee ──────────────────────────────────────
-        $assigneeId   = $user->id;   // default: current user
+        $assigneeId   = $user->id;
         $assigneeLabel = $user->name;
 
         if ($assigneeName) {
@@ -113,16 +104,14 @@ class ChatController extends Controller
                 $assigneeLabel = $found->name;
             } else {
                 return response()->json([
-                    'reply' => "⚠️ لم أجد مستخدماً باسم **{$assigneeName}**.\n\nالمستخدمون المتاحون:\n"
-                        . User::orderBy('name')->get()->map(fn($u) => "• {$u->name}")->implode("\n")
+                    'reply' => "Utilisateur \"{$assigneeName}\" non trouve.\n\nUtilisateurs disponibles:\n"
+                        . User::orderBy('name')->get()->map(fn($u) => "- {$u->name}")->implode("\n")
                 ]);
             }
         }
 
-        // ── Parse schedule ────────────────────────────────────────
         $runAt = $this->parseSchedule($schedule);
 
-        // ── Dispatch Job ──────────────────────────────────────────
         $job = CreateTaskJob::dispatch($title, $description, $priority, $assigneeId);
 
         if ($runAt && $runAt->isFuture()) {
@@ -132,35 +121,30 @@ class ChatController extends Controller
             $timeLabel = $runAt->format('H:i') . ' (' . $runAt->diffForHumans() . ')';
 
             return response()->json([
-                'reply' => "✅ تمت الجدولة بنجاح!\n\n"
-                    . "📌 **{$title}**\n"
-                    . "🎯 الأولوية: {$this->priorityLabel($priority)}\n"
-                    . "👤 مسند إلى: **{$assigneeLabel}**\n"
-                    . "⏰ وقت الإنشاء: {$timeLabel}"
+                'reply' => "Planifie avec succes!\n\n"
+                    . "Tache: {$title}\n"
+                    . "Priorite: {$this->priorityLabel($priority)}\n"
+                    . "Assigne a: {$assigneeLabel}\n"
+                    . "Heure de creation: {$timeLabel}"
             ]);
         }
 
-        // Immediate
         CreateTaskJob::dispatch($title, $description, $priority, $assigneeId);
 
         return response()->json([
-            'reply' => "✅ تم إنشاء المهمة!\n\n"
-                . "📌 **{$title}**\n"
-                . "🎯 الأولوية: {$this->priorityLabel($priority)}\n"
-                . "👤 مسند إلى: **{$assigneeLabel}**"
+            'reply' => "Tache creee!\n\n"
+                . "Tache: {$title}\n"
+                . "Priorite: {$this->priorityLabel($priority)}\n"
+                . "Assigne a: {$assigneeLabel}"
         ]);
     }
 
-    /**
-     * Call Groq to extract structured task data as JSON.
-     */
     private function parseTaskFromMessage(string $userMessage): ?array
     {
         try {
             $apiKey = config('services.groq.key', '');
             if (empty($apiKey)) return null;
 
-            // Build users list so AI can match names
             $usersList = User::orderBy('name')->pluck('name')->implode(', ');
 
             $response = Http::withoutVerifying()
@@ -173,30 +157,30 @@ class ChatController extends Controller
                         [
                             'role'    => 'system',
                             'content' => <<<PROMPT
-Extract task details from the user message and return ONLY a valid JSON object with no extra text or markdown.
+Extraire les details de la tache du message utilisateur et retourner UNIQUEMENT un objet JSON valide sans texte supplementaire ni markdown.
 
-JSON format:
+Format JSON:
 {
-  "title": "task title",
-  "description": "task description or empty string",
+  "title": "titre de la tache",
+  "description": "description ou chaine vide",
   "priority": "high|medium|low",
   "schedule": "5 minutes|2 hours|1 day|14:30|null",
-  "assigned_to": "exact username or null"
+  "assigned_to": "nom exact ou null"
 }
 
-Rules:
-- priority: default "medium" if not mentioned
+Regles:
+- priority: defaut "medium" si non mentionnee
 - schedule:
-    "بعد 5 دقائق" or "after 5 minutes" or "dans 5 minutes" → "5 minutes"
-    "بعد 3 ساعات" or "after 3 hours" → "3 hours"
-    "الساعة 14:30" or "at 2:30pm" or "à 14h30" → "14:30"
-    no time mentioned → null
+    "apres 5 minutes" ou "after 5 minutes" ou "dans 5 minutes" -> "5 minutes"
+    "apres 3 heures" ou "after 3 hours" -> "3 hours"
+    "a 14h30" ou "at 2:30pm" ou "a 14:30" -> "14:30"
+    aucun horaire mentionne -> null
 - assigned_to:
-    "سند لـ Ahmed" or "assign to Ahmed" or "assigner à Ahmed" → "Ahmed"
-    no assignee mentioned → null
-    Available users: {$usersList}
+    "assigner a Ahmed" ou "assign to Ahmed" ou "assigner a Ahmed" -> "Ahmed"
+    aucun assignataire mentionne -> null
+    Utilisateurs disponibles: {$usersList}
 
-Return ONLY the JSON, no explanation, no markdown fences.
+Retourner UNIQUEMENT le JSON, pas d explication, pas de fences markdown.
 PROMPT
                         ],
                         ['role' => 'user', 'content' => $userMessage],
@@ -219,22 +203,19 @@ PROMPT
         }
     }
 
-    /**
-     * Parse schedule string into Carbon datetime.
-     */
     private function parseSchedule(?string $schedule): ?Carbon
     {
         if (!$schedule || in_array(strtolower(trim($schedule)), ['null', ''])) return null;
 
         $s = strtolower(trim($schedule));
 
-        if (preg_match('/^(\d+)\s*(hour|hours|h)$/', $s, $m))
+        if (preg_match('/^(\d+)\s*(hour|hours|h|heure|heures)$/', $s, $m))
             return Carbon::now()->addHours((int)$m[1]);
 
-        if (preg_match('/^(\d+)\s*(minute|minutes|min|mins)$/', $s, $m))
+        if (preg_match('/^(\d+)\s*(minute|minutes|min|mins|minute|minutes)$/', $s, $m))
             return Carbon::now()->addMinutes((int)$m[1]);
 
-        if (preg_match('/^(\d+)\s*(day|days)$/', $s, $m))
+        if (preg_match('/^(\d+)\s*(day|days|jour|jours)$/', $s, $m))
             return Carbon::now()->addDays((int)$m[1]);
 
         if (preg_match('/^(\d{1,2}):(\d{2})$/', $s, $m)) {
@@ -246,19 +227,15 @@ PROMPT
         return null;
     }
 
-    // ══════════════════════════════════════════════════════════════
-    //  DELETE HELPERS
-    // ══════════════════════════════════════════════════════════════
-
     private function detectDeleteIntent(string $message): ?string
     {
         $msg = mb_strtolower($message);
-        $hasDelete = $this->containsAny($msg, ['حذف', 'احذف', 'امسح', 'مسح', 'delete', 'remove', 'supprimer']);
+        $hasDelete = $this->containsAny($msg, ['supprimer', 'supprime', 'delete', 'remove', 'effacer']);
         if (!$hasDelete) return null;
 
-        if ($this->containsAny($msg, ['high', 'عالية', 'عاجلة', 'urgent']))  return 'high';
-        if ($this->containsAny($msg, ['medium', 'متوسطة', 'moyen']))          return 'medium';
-        if ($this->containsAny($msg, ['low', 'منخفضة', 'bas', 'faible']))     return 'low';
+        if ($this->containsAny($msg, ['high', 'haute', 'urgent', 'elevee']))  return 'high';
+        if ($this->containsAny($msg, ['medium', 'moyenne', 'moyen']))          return 'medium';
+        if ($this->containsAny($msg, ['low', 'basse', 'faible']))     return 'low';
 
         return null;
     }
@@ -266,41 +243,37 @@ PROMPT
     private function executePriorityDelete(string $priority, $user): JsonResponse
     {
         $deleted = KanbanTask::where('priority', $priority)->delete();
-        Log::info("User [{$user->name}] deleted {$deleted} tasks with priority '{$priority}'");
+        Log::info("Utilisateur [{$user->name}] a supprime {$deleted} taches avec priorite '{$priority}'");
         return response()->json([
-            'reply' => "✅ تم حذف **{$deleted} مهمة** بأولوية **{$this->priorityLabel($priority)}** بنجاح."
+            'reply' => "{$deleted} taches avec priorite {$this->priorityLabel($priority)} supprimees avec succes."
         ]);
     }
 
     private function isConfirmation(string $msg): bool
     {
-        return $this->containsAny(mb_strtolower($msg), ['تأكيد', 'نعم', 'ok', 'oui', 'yes', 'confirm']);
+        return $this->containsAny(mb_strtolower($msg), ['confirmer', 'oui', 'ok', 'yes', 'confirm']);
     }
 
     private function isCancellation(string $msg): bool
     {
-        return $this->containsAny(mb_strtolower($msg), ['إلغاء', 'لا', 'cancel', 'non', 'no', 'تراجع']);
+        return $this->containsAny(mb_strtolower($msg), ['annuler', 'non', 'cancel', 'no', 'retour']);
     }
 
     private function priorityLabel(string $priority): string
     {
         return match($priority) {
-            'high'   => 'عالية 🔴',
-            'medium' => 'متوسطة 🟡',
-            'low'    => 'منخفضة 🟢',
+            'high'   => 'Haute',
+            'medium' => 'Moyenne',
+            'low'    => 'Basse',
             default  => $priority,
         };
     }
-
-    // ══════════════════════════════════════════════════════════════
-    //  GROQ AI (general questions)
-    // ══════════════════════════════════════════════════════════════
 
     private function callGroqApi(string $userMessage, $user): ?string
     {
         try {
             $apiKey = config('services.groq.key', '');
-            if (empty($apiKey)) return 'مفتاح Groq API غير مضبوط.';
+            if (empty($apiKey)) return 'Cle API Groq non configuree.';
 
             $response = Http::withoutVerifying()
                 ->withHeaders([
@@ -329,10 +302,6 @@ PROMPT
         }
     }
 
-    // ══════════════════════════════════════════════════════════════
-    //  SYSTEM CONTEXT
-    // ══════════════════════════════════════════════════════════════
-
     private function buildSystemContext($currentUser): string
     {
         $totalTasks   = KanbanTask::count();
@@ -346,28 +315,28 @@ PROMPT
         $columns = KanbanColumn::withCount('tasks')->orderBy('position')->get();
         $columnsInfo = '';
         foreach ($columns as $col) {
-            $columnsInfo .= "  - \"{$col->name}\": {$col->tasks_count} مهمة\n";
+            $columnsInfo .= "  - \"{$col->name}\": {$col->tasks_count} taches\n";
         }
-        if (empty(trim($columnsInfo))) $columnsInfo = "  لا توجد أعمدة.\n";
+        if (empty(trim($columnsInfo))) $columnsInfo = "  Aucune colonne.\n";
 
         $users = User::withCount('tasks')->orderBy('name')->get();
         $usersInfo = '';
         foreach ($users as $u) {
-            $isMe = ($u->id === $currentUser->id) ? ' (الحالي)' : '';
-            $usersInfo .= "  - {$u->name}{$isMe}: {$u->tasks_count} مهمة\n";
+            $isMe = ($u->id === $currentUser->id) ? ' (actuel)' : '';
+            $usersInfo .= "  - {$u->name}{$isMe}: {$u->tasks_count} taches\n";
         }
 
         $tasksByPriorityInfo = '';
-        foreach (['high' => 'عالية 🔴', 'medium' => 'متوسطة 🟡', 'low' => 'منخفضة 🟢'] as $p => $label) {
+        foreach (['high' => 'Haute', 'medium' => 'Moyenne', 'low' => 'Basse'] as $p => $label) {
             $tasks = KanbanTask::where('priority', $p)->with(['user', 'column'])->get();
             $tasksByPriorityInfo .= "  [{$label}]:\n";
             if ($tasks->isEmpty()) {
-                $tasksByPriorityInfo .= "    • لا توجد مهام\n";
+                $tasksByPriorityInfo .= "    - Aucune tache\n";
             } else {
                 foreach ($tasks as $t) {
-                    $assignee = $t->user   ? $t->user->name   : 'غير مُسند';
-                    $col      = $t->column ? $t->column->name : 'غير محدد';
-                    $tasksByPriorityInfo .= "    • \"{$t->title}\" | {$col} | {$assignee}\n";
+                    $assignee = $t->user   ? $t->user->name   : 'Non assigne';
+                    $col      = $t->column ? $t->column->name : 'Non defini';
+                    $tasksByPriorityInfo .= "    - \"{$t->title}\" | {$col} | {$assignee}\n";
                 }
             }
         }
@@ -375,31 +344,31 @@ PROMPT
         $myTasks = KanbanTask::where('user_id', $currentUser->id)->with('column')->latest()->limit(10)->get();
         $myTasksInfo = '';
         foreach ($myTasks as $t) {
-            $col = $t->column ? $t->column->name : 'غير محدد';
+            $col = $t->column ? $t->column->name : 'Non defini';
             $myTasksInfo .= "  - \"{$t->title}\" | {$t->priority} | {$col}\n";
         }
-        if (empty(trim($myTasksInfo))) $myTasksInfo = "  لا توجد مهام.\n";
+        if (empty(trim($myTasksInfo))) $myTasksInfo = "  Aucune tache.\n";
 
         return <<<CONTEXT
-أنت مساعد ذكاء اصطناعي لتطبيق EPG Kanban — منظمة EPG.ma.
-أجب بذكاء وإيجاز بناءً على البيانات الحقيقية أدناه.
-أجب بلغة السؤال (عربية/فرنسية/إنجليزية).
-لا تخترع معلومات. عمليات الإنشاء والحذف تتم بشكل مستقل.
+Vous etes un assistant IA pour l application EPG Kanban - organisation EPG.ma.
+Repondez intelligemment et brievement en vous basant sur les donnees reelles ci-dessous.
+Repondez dans la langue de la question (francais/anglais/arabe).
+N inventez pas d informations. Les operations de creation et suppression sont independantes.
 
-=== بيانات النظام ===
-المستخدم الحالي: {$currentUser->name} (ID: {$currentUser->id})
-الإحصائيات: {$totalTasks} مهمة | {$totalUsers} مستخدم | {$totalColumns} عمود
-الأولويات: عالية={$highCount} | متوسطة={$mediumCount} | منخفضة={$lowCount} | مهامي={$myTasksCount}
+=== Donnees du systeme ===
+Utilisateur actuel: {$currentUser->name} (ID: {$currentUser->id})
+Statistiques: {$totalTasks} taches | {$totalUsers} utilisateurs | {$totalColumns} colonnes
+Priorites: Haute={$highCount} | Moyenne={$mediumCount} | Basse={$lowCount} | Mes taches={$myTasksCount}
 
-الأعمدة:
+Colonnes:
 {$columnsInfo}
-المستخدمون:
+Utilisateurs:
 {$usersInfo}
-المهام حسب الأولوية:
+Taches par priorite:
 {$tasksByPriorityInfo}
-مهامي:
+Mes taches:
 {$myTasksInfo}
-=== نهاية البيانات ===
+=== Fin des donnees ===
 CONTEXT;
     }
 

@@ -3,5 +3,5 @@
         <rect x="3" y="3" width="18" height="18" rx="3"/>
         <path d="M8 12h8M12 8v8"/>
     </svg>
-    <p>No tasks yet</p>
+    <p>Aucune tâche</p>
 </div>

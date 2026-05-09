@@ -10,14 +10,14 @@
                 <span id="avatarInitial">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
                 <img id="avatarPreview" src="" alt="" style="display:none">
             @endif
-            <div class="profile-ava-overlay">Edit</div>
+            <div class="profile-ava-overlay">Modifier</div>
         </div>
-        <div class="profile-ava-hint">Click to change photo</div>
+        <div class="profile-ava-hint">Cliquez pour changer la photo</div>
 
         <div class="profile-display-name">{{ auth()->user()->name }}</div>
         <div class="profile-display-email">{{ auth()->user()->email }}</div>
         <span class="profile-role-badge {{ auth()->user()->isAdmin() ? 'role-admin' : 'role-user' }}">
-            {{ auth()->user()->isAdmin() ? 'Admin' : 'Member' }}
+            {{ auth()->user()->isAdmin() ? 'Administrateur' : 'Membre' }}
         </span>
     </div>
 
