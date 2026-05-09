@@ -43,3 +43,5 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat/ask', [ChatController::class, 'ask'])->name('chat.ask')->middleware('auth');});
     Route::get('/chat-test', function() {return response()->json(['status' => 'ok','route_exists' => true,'csrf_token' => csrf_token(),]);});
     Route::redirect('/', '/kanban');
+    Route::get('/offline', fn() => view('offline'))->name('offline');
+

@@ -1,12 +1,16 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr" data-theme="light">
+<html lang="ar" dir="ltr" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Tableau Kanban EPG</title>
+    <title>EPG Kanban Board</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
+    {{-- ✅ PWA --}}
+    @include('partials.pwa-head')
+
     @include('kanban.partials.styles')
 </head>
 <body>
@@ -30,11 +34,12 @@
 @include('components.chat_styles')
 @include('components.chat_widget')
 @include('chatbot')
+
 <script>
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     const isAdmin   = {{ $isAdmin ? 'true' : 'false' }};
 
-    /* ── Liste des utilisateurs repliable ── */
+    /* ── Collapsible Users List ── */
     function toggleUsers() {
         const btn  = document.getElementById('usersToggleBtn');
         const list = document.getElementById('usersList');
@@ -42,7 +47,7 @@
         list.classList.toggle('open');
     }
 
-    /* ── Modales ── */
+    /* ── Modals ── */
     function openTaskModal(columnId) {
         document.getElementById('taskColumnId').value = columnId;
         document.getElementById('taskModal').classList.add('active');
@@ -84,7 +89,7 @@
         }
     });
 
-    /* ── Colonnes triables ── */
+    /* ── Sortable Columns ── */
     new Sortable(document.getElementById('board'), {
         group: 'columns',
         animation: 150,
@@ -106,7 +111,7 @@
         }
     });
 
-    /* ── Tâches triables ── */
+    /* ── Sortable Tasks ── */
     document.querySelectorAll('.task-list').forEach(list => {
         new Sortable(list, {
             group: 'tasks',
@@ -139,7 +144,7 @@
         });
     });
 
-    /* ── Basculer le mode sombre ── */
+    /* ── Dark mode toggle ── */
     (function() {
         const saved = localStorage.getItem('epg-theme') || 'light';
         document.documentElement.setAttribute('data-theme', saved);

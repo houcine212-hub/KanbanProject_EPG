@@ -6,6 +6,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Tableau de bord — EPG Kanban</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    {{-- ✅ PWA --}}
+    @include('partials.pwa-head')
+
     @include('admin.partials.styles')
 </head>
 <body>
@@ -31,6 +35,7 @@
 @include('components.chat_styles')
 @include('components.chat_widget')
 @include('chatbot')
+
 <script>
     (function() {
         const saved = localStorage.getItem('epg-theme') || 'light';
