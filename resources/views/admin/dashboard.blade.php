@@ -28,7 +28,9 @@
 </div>
 
 @include('admin.modals.add-column-modal')
-
+@include('components.chat_styles')
+@include('components.chat_widget')
+@include('chatbot')
 <script>
     (function() {
         const saved = localStorage.getItem('epg-theme') || 'light';

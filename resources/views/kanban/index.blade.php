@@ -27,7 +27,9 @@
     @include('kanban.modals.column-modal')
     @include('kanban.modals.edit-task-modal')
 @endif
-
+@include('components.chat_styles')
+@include('components.chat_widget')
+@include('chatbot')
 <script>
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     const isAdmin   = {{ $isAdmin ? 'true' : 'false' }};

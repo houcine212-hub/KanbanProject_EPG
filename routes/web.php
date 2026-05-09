@@ -9,6 +9,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KanbanController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ChatController;
 
 // Auth
 Route::get('/login',    [AuthController::class, 'showLogin'])->name('login');
@@ -38,6 +39,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile',                  [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/password',         [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::patch('/profile/avatar',           [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
-});
-
-Route::redirect('/', '/kanban');
+    //chat bot ai
+    Route::post('/chat/ask', [ChatController::class, 'ask'])->name('chat.ask')->middleware('auth');});
+    Route::get('/chat-test', function() {return response()->json(['status' => 'ok','route_exists' => true,'csrf_token' => csrf_token(),]);});
+    Route::redirect('/', '/kanban');
