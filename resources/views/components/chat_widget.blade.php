@@ -1,10 +1,12 @@
 <div class="chat-widget-container" id="chatWidget">
     <button class="chat-toggle-btn" id="chatToggleBtn" onclick="toggleChat()" title="Assistant IA">
         <svg class="chat-icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-            <line x1="12" y1="19" x2="12" y2="23"/>
-            <line x1="8" y1="23" x2="16" y2="23"/>
+            <rect x="3" y="6" width="18" height="13" rx="2"/>
+            <circle cx="8.5" cy="12" r="1.5"/>
+            <circle cx="15.5" cy="12" r="1.5"/>
+            <path d="M9 16h6"/>
+            <path d="M9 3h6"/>
+            <line x1="12" y1="3" x2="12" y2="6"/>
         </svg>
         <svg class="chat-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"/>
@@ -17,10 +19,12 @@
             <div class="chat-header-info">
                 <div class="chat-avatar">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px">
-                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
-                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                        <line x1="12" y1="19" x2="12" y2="23"/>
-                        <line x1="8" y1="23" x2="16" y2="23"/>
+                        <rect x="3" y="6" width="18" height="13" rx="2"/>
+                        <circle cx="8.5" cy="12" r="1.5"/>
+                        <circle cx="15.5" cy="12" r="1.5"/>
+                        <path d="M9 16h6"/>
+                        <path d="M9 3h6"/>
+                        <line x1="12" y1="3" x2="12" y2="6"/>
                     </svg>
                 </div>
                 <div>

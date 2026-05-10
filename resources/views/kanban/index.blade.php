@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 
-    {{-- ✅ PWA --}}
     @include('partials.pwa-head')
 
     @include('kanban.partials.styles')
@@ -39,7 +38,6 @@
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     const isAdmin   = {{ $isAdmin ? 'true' : 'false' }};
 
-    /* ── Collapsible Users List ── */
     function toggleUsers() {
         const btn  = document.getElementById('usersToggleBtn');
         const list = document.getElementById('usersList');
@@ -47,7 +45,6 @@
         list.classList.toggle('open');
     }
 
-    /* ── Modals ── */
     function openTaskModal(columnId) {
         document.getElementById('taskColumnId').value = columnId;
         document.getElementById('taskModal').classList.add('active');
@@ -89,7 +86,6 @@
         }
     });
 
-    /* ── Sortable Columns ── */
     new Sortable(document.getElementById('board'), {
         group: 'columns',
         animation: 150,
@@ -111,7 +107,6 @@
         }
     });
 
-    /* ── Sortable Tasks ── */
     document.querySelectorAll('.task-list').forEach(list => {
         new Sortable(list, {
             group: 'tasks',
@@ -144,7 +139,7 @@
         });
     });
 
-    /* ── Dark mode toggle ── */
+    /* dark mode */
     (function() {
         const saved = localStorage.getItem('epg-theme') || 'light';
         document.documentElement.setAttribute('data-theme', saved);

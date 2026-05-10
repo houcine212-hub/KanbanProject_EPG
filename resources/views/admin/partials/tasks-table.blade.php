@@ -66,4 +66,7 @@
             @endforelse
         </tbody>
     </table>
+     <div style="padding: 1rem">
+        {{ $recentTasks->links('vendor.pagination.bootstrap-5') }}
+    </div>
 </div>
